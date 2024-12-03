@@ -1,12 +1,12 @@
 import '../styles/LoginPage.css';
-// import React, { useState } from 'react';
-// import axios from 'axios';
+import React, { useState } from 'react';
+import axios from 'axios';
 // import { Navigate, useNavigate } from 'react-router-dom'; // for navigation after login
 
 // const Login = () => {
-//   const [username, setUsername] = useState('');
-//   const [password, setPassword] = useState('');
-//   const [role, setRole] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [role, setRole] = useState('');
 //   const [error, setError] = useState('');
 //   const history = useNavigate();
 

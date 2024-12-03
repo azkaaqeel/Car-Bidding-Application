@@ -3,6 +3,7 @@ const mysql = require('mysql2');
 const cors = require('cors');
 const bcrypt = require('bcrypt'); // Import bcrypt for password hashing
 const jwt = require('jsonwebtoken'); // Import JWT for token generation
+const multer=require('multer')
 
 const app = express();
 
@@ -37,10 +38,64 @@ app.get('/api/cars', (req, res) => {
   });
 });
 
+app.post('/api/cars', (req, res) => {
+  const {
+    make,
+    model,
+    year,
+    mileage,
+    color,
+    price,
+    description,
+    seller_id,
+  } = req.body;
+
+  // SQL query to insert the car
+  const query =
+    'INSERT INTO Cars (make, model, year, mileage, color, price, description, seller_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())';
+
+  const values = [
+    make,
+    model,
+    year,
+    mileage,
+    color,
+    price,
+    description,
+    seller_id,
+  ];
+
+  db.query(query, values, (err, result) => {
+    if (err) {
+      console.error('Error inserting car:', err);
+      return res.status(500).json({ message: 'Error inserting car' });
+    }
+    res.status(200).json({ message: 'Car added successfully!', car_id: result.insertId });
+  });
+});
+
+
+app.get('/api/cars/seller/:seller_id', (req, res) => {
+  const { seller_id } = req.params;
+
+  const query = 'SELECT * FROM Cars WHERE seller_id = ?';
+  db.query(query, [seller_id], (err, results) => {
+    if (err) {
+      console.error('Error fetching cars:', err);
+      return res.status(500).json({ message: 'Failed to fetch cars' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'No cars found for this seller' });
+    }
+
+    res.json(results);
+  });
+});
 
 app.post('/api/login', (req, res) => {
   const { email, password, role } = req.body;
-  const secretKey="admin_admin"
+  const secretKey = "admin_admin"
 
   // Validate input
   if (!email || !password || !role) {
@@ -65,7 +120,7 @@ app.post('/api/login', (req, res) => {
 
     // Compare hashed password
     const isPasswordMatch = await bcrypt.compare(password, user.password);
-    if (user.password!=password) {
+    if (user.password != password) {
       console.log("nomatch")
       return res.status(401).json({ success: false, message: 'Invalid password' });
     }
@@ -126,18 +181,18 @@ app.get('/api/cars/:id', (req, res) => {
   const query = 'SELECT * FROM Cars WHERE car_id = ?';
 
   db.query(query, [carId], (err, results) => {
-      if (err) {
-          console.error('Error fetching car by ID:', err);
-          return res.status(500).json({ message: 'Internal Server Error' });
-      }
+    if (err) {
+      console.error('Error fetching car by ID:', err);
+      return res.status(500).json({ message: 'Internal Server Error' });
+    }
 
-      if (results.length === 0) {
-          // If no car is found, send a 404 response
-          return res.status(404).json({ message: 'Car not found' });
-      }
+    if (results.length === 0) {
+      // If no car is found, send a 404 response
+      return res.status(404).json({ message: 'Car not found' });
+    }
 
-      // Send the fetched car data as a response
-      res.json(results[0]);
+    // Send the fetched car data as a response
+    res.json(results[0]);
   });
 });
 
@@ -145,7 +200,7 @@ app.get('/api/cars/:id', (req, res) => {
 
 
 
-  
+
 // Start server
 const PORT = 5000;
 app.listen(PORT, () => console.log(`Backend running on http://localhost:${PORT}`));

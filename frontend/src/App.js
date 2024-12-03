@@ -5,6 +5,8 @@ import HomePage from './pages/HomePage';
 import Admin from './pages/Admin';
 import Buyer from './pages/Buyer';
 import CarDetail from './pages/CarDetail';
+import Seller from './pages/Seller';
+import SellerDash from './pages/SellerDash';
 
 
 const App = () => {
@@ -19,6 +21,10 @@ const App = () => {
                 <Route path="/Admin" element={<Admin />} />
                 <Route path="/Buyer" element={<Buyer />} />
                 <Route path="/car/:car_id" element={<CarDetail />} />
+                <Route path="/Seller" element={<Seller />} />
+                <Route path="/SellerDash" element={<SellerDash />} />
+
+
 
 
             </Routes>
