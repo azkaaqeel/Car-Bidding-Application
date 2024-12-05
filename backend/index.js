@@ -3,7 +3,7 @@ const mysql = require('mysql2');
 const cors = require('cors');
 const bcrypt = require('bcrypt'); // Import bcrypt for password hashing
 const jwt = require('jsonwebtoken'); // Import JWT for token generation
-const multer=require('multer')
+const multer = require('multer')
 
 const app = express();
 
@@ -14,7 +14,7 @@ app.use(express.json());
 // Database connection
 const db = mysql.createConnection({
   host: 'localhost',  // your database host
-  user: 'root',       // your database username
+  user: 'Project',       // your database username
   password: 'Rakhidev11!!',       // your database password
   database: 'projectdata',  // your database name
 });
@@ -90,6 +90,33 @@ app.get('/api/cars/seller/:seller_id', (req, res) => {
     }
 
     res.json(results);
+  });
+});
+
+
+// API to place a bid
+app.post('/api/bids', (req, res) => {
+  const { buyer_id, bid_amount, car_id } = req.body;
+
+  // Validate required fields
+  if (!buyer_id || !bid_amount || !car_id) {
+    return res.status(400).json({ success: false, message: 'buyer_id, bid_amount, and car_id are required.' });
+  }
+
+  // SQL query to insert the bid into the database
+  const query = `
+    INSERT INTO Bids (buyer_id, bid_amount, car_id)
+    VALUES (?, ?, ?);
+  `;
+  const arr = [buyer_id, bid_amount, car_id];
+
+  // Insert the bid into the database
+  db.query(query, arr, (err, result) => {
+    if (err) {
+      console.error('Error inserting bid:', err);
+      return res.status(500).json({ message: 'Error inserting bid' });
+    }
+    res.status(200).json({ message: 'Bid added successfully!', car_id: result.insertId });
   });
 });
 
