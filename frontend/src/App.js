@@ -4,7 +4,7 @@ import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
 import Admin from './pages/Admin';
 import Buyer from './pages/Buyer';
-import CarDetails from './pages/CarDetails';
+// import CarDetails from './pages/CarDetails';
 import Seller from './pages/Seller';
 import SellerDash from './pages/SellerDash';
 import Details from './pages/Details';
@@ -15,10 +15,10 @@ const App = () => {
         <Router>
             <Routes>
                 {/* Set the LoginPage as the default route */}
-                <Route path="/" element={<LoginPage />} />
+                <Route path="/" element={<HomePage />} />
+                <Route path="/Login" element={<LoginPage />} />
                 
                 {/* After login, this will show the HomePage */}
-                <Route path="/home" element={<HomePage />} />
                 <Route path="/Admin" element={<Admin />} />
                 <Route path="/Buyer" element={<Buyer />} />
                 <Route path="/car/:car_id" element={<Details />} />

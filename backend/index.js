@@ -14,8 +14,8 @@ app.use(express.json());
 // Database connection
 const db = mysql.createConnection({
   host: 'localhost',  // your database host
-  user: 'root',       // your database username
-  password: 'mahnoor1234',       // your database password
+  user: 'Project',       // your database username
+  password: 'Rakhidev11!!',       // your database password
   database: 'dbproject',  // your database name
 });
 
@@ -74,6 +74,22 @@ app.post('/api/cars', (req, res) => {
   });
 });
 
+
+app.get('/api/cars/:car_id/bids', (req, res) => {
+  const car_id = req.params.car_id;
+
+  db.query(
+    'SELECT b.bid_amount, b.buyer_id, b.bid_time, b.status FROM Bids b WHERE b.car_id = ? ORDER BY b.bid_time DESC',
+    [car_id],
+    (err, result) => {
+      if (err) {
+        console.error('Error fetching bids:', err);
+        return res.status(500).send('Server error');
+      }
+      res.json(result); // Send the bids as JSON
+    }
+  );
+});
 
 app.get('/api/cars/seller/:seller_id', (req, res) => {
   const { seller_id } = req.params;
