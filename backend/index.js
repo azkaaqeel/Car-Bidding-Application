@@ -14,9 +14,9 @@ app.use(express.json());
 // Database connection
 const db = mysql.createConnection({
   host: 'localhost',  // your database host
-  user: 'Project',       // your database username
-  password: 'Rakhidev11!!',       // your database password
-  database: 'projectdata',  // your database name
+  user: 'root',       // your database username
+  password: 'mahnoor1234',       // your database password
+  database: 'dbproject',  // your database name
 });
 
 // Check connection
@@ -94,31 +94,31 @@ app.get('/api/cars/seller/:seller_id', (req, res) => {
 });
 
 
-// API to place a bid
 app.post('/api/bids', (req, res) => {
   const { buyer_id, bid_amount, car_id } = req.body;
 
-  // Validate required fields
+  console.log(buyer_id)
+  console.log(bid_amount)
+  console.log(car_id)
+
   if (!buyer_id || !bid_amount || !car_id) {
-    return res.status(400).json({ success: false, message: 'buyer_id, bid_amount, and car_id are required.' });
+    console.log("here")
+    return res.status(400).json({ message: 'All fields are required.' });
   }
 
-  // SQL query to insert the bid into the database
-  const query = `
-    INSERT INTO Bids (buyer_id, bid_amount, car_id)
-    VALUES (?, ?, ?);
-  `;
+  const query = 'INSERT INTO Bids (buyer_id, bid_amount, car_id) VALUES (?, ?, ?)';
   const arr = [buyer_id, bid_amount, car_id];
 
-  // Insert the bid into the database
   db.query(query, arr, (err, result) => {
+    console.log('Query Executed:', db.format(query, arr)); // Debug the query
     if (err) {
       console.error('Error inserting bid:', err);
       return res.status(500).json({ message: 'Error inserting bid' });
     }
-    res.status(200).json({ message: 'Bid added successfully!', car_id: result.insertId });
+    res.status(200).json({ message: 'Bid added successfully!', bid_id: result.insertId });
   });
 });
+
 
 app.post('/api/login', (req, res) => {
   const { email, password, role } = req.body;

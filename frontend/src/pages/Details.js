@@ -44,7 +44,7 @@ const Details = () => {
             const response = await axios.post('http://localhost:5000/api/bids', {
                 buyer_id: userId,
                 bid_amount: bidamt,
-                carid: car_id,
+                car_id: car_id,
 
             })
        
