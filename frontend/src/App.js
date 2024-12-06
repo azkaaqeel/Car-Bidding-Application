@@ -4,9 +4,10 @@ import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
 import Admin from './pages/Admin';
 import Buyer from './pages/Buyer';
-import CarDetail from './pages/CarDetail';
+import CarDetails from './pages/CarDetails';
 import Seller from './pages/Seller';
 import SellerDash from './pages/SellerDash';
+import Details from './pages/Details';
 
 
 const App = () => {
@@ -20,7 +21,7 @@ const App = () => {
                 <Route path="/home" element={<HomePage />} />
                 <Route path="/Admin" element={<Admin />} />
                 <Route path="/Buyer" element={<Buyer />} />
-                <Route path="/car/:car_id" element={<CarDetail />} />
+                <Route path="/car/:car_id" element={<Details />} />
                 <Route path="/Seller" element={<Seller />} />
                 <Route path="/SellerDash" element={<SellerDash />} />
 
