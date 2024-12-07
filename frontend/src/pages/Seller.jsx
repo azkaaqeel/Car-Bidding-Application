@@ -1,36 +1,34 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 
-
 const Seller = () => {
     const [message, setMessage] = useState('');
-
     const [isSeller, setIsSeller] = useState(false);
+    const [categoryManual, setCategoryManual] = useState(false); // State to handle manual entry for category
+    const [makeManual, setMakeManual] = useState(false); // State to handle manual entry for make
     const navigate = useNavigate();
 
-
     useEffect(() => {
-        // Check if the user has the Buyer role
+        // Check if the user has the Seller role
         const storedUserRole = document.cookie
             .split('; ')
-            .find((row) => row.startsWith('userRole='))
-            ?.split('=')[1];
+            .find((row) => row.startsWith('userRole='))?.split('=')[1];
 
         if (storedUserRole === 'Seller') {
             setIsSeller(true);
-            // fetchCars();
         } else {
             setIsSeller(false);
         }
     }, []);
-    if (isSeller) {
 
+    if (isSeller) {
         const addCar = async (e) => {
             e.preventDefault();
-
+        
             const carData = {
-                make: document.getElementById('make').value,
+                make: makeManual ? document.getElementById('make').value : document.getElementById('makeSelect').value, // Handle make selection
+                category_name: categoryManual ? document.getElementById('category').value : document.getElementById('categorySelect').value, // Use `category_name` instead of `category`
                 model: document.getElementById('model').value,
                 year: parseInt(document.getElementById('year').value),
                 mileage: parseInt(document.getElementById('mileage').value),
@@ -40,7 +38,7 @@ const Seller = () => {
                 seller_id: 1, // Replace with actual seller_id if available
                 image_path: document.getElementById('image_path').value,
             };
-
+        
             try {
                 const response = await fetch('http://localhost:5000/api/cars', {
                     method: 'POST',
@@ -49,7 +47,7 @@ const Seller = () => {
                     },
                     body: JSON.stringify(carData),
                 });
-
+        
                 if (response.ok) {
                     alert('Car added successfully!');
                 } else {
@@ -60,6 +58,7 @@ const Seller = () => {
                 setMessage(`Error: ${err.message}`);
             }
         };
+        
 
         return (
             <>
@@ -83,6 +82,7 @@ const Seller = () => {
                         onSubmit={addCar}
                         className="bg-white shadow-lg rounded-lg p-8 max-w-xl mx-auto"
                     >
+                        {/* Picture */}
                         <div className="mb-4">
                             <label className="block text-gray-700 font-medium mb-2">Picture:</label>
                             <input
@@ -92,18 +92,70 @@ const Seller = () => {
                             />
                         </div>
 
+                        {/* Make (Dropdown + Manual Entry) */}
                         <div className="mb-4">
                             <label className="block text-gray-700 font-medium mb-2">Make:</label>
-                            <input
-                                type="text"
-                                id="make"
-                                name="make"
-                                maxLength="50"
-                                required
-                                className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
-                            />
+                            <div className="flex items-center space-x-4">
+                                <select
+                                    id="makeSelect"
+                                    className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                                    onChange={(e) => setMakeManual(e.target.value === 'Other')}
+                                >
+                                    <option value="">Select Make</option>
+                                    <option value="Toyota">Toyota</option>
+                                    <option value="Honda">Honda</option>
+                                    <option value="Ford">Ford</option>
+                                    <option value="BMW">BMW</option>
+                                    <option value="Other">Other</option>
+                                </select>
+
+                                {makeManual && (
+                                    <input
+                                        type="text"
+                                        id="make"
+                                        name="make"
+                                        maxLength="50"
+                                        required
+                                        className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                                        placeholder="Enter custom make"
+                                    />
+                                )}
+                            </div>
                         </div>
 
+                        {/* Category (Dropdown + Manual Entry) */}
+                        <div className="mb-4">
+                            <label className="block text-gray-700 font-medium mb-2">Category:</label>
+                            <div className="flex items-center space-x-4">
+                                <select
+                                    id="categorySelect"
+                                    className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                                    onChange={(e) => setCategoryManual(e.target.value === 'Other')}
+                                >
+                                    <option value="">Select Category</option>
+                                    <option value="Sedan">Sedan</option>
+                                    <option value="SUV">SUV</option>
+                                    <option value="Truck">Truck</option>
+                                    <option value="Coupe">Coupe</option>
+                                    <option value="Convertible">Convertible</option>
+                                    <option value="Other">Other</option>
+                                </select>
+
+                                {categoryManual && (
+                                    <input
+                                        type="text"
+                                        id="category"
+                                        name="category"
+                                        maxLength="50"
+                                        required
+                                        className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                                        placeholder="Enter custom category"
+                                    />
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Model */}
                         <div className="mb-4">
                             <label className="block text-gray-700 font-medium mb-2">Model:</label>
                             <input
@@ -116,6 +168,7 @@ const Seller = () => {
                             />
                         </div>
 
+                        {/* Year and Mileage */}
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-gray-700 font-medium mb-2">Year:</label>
@@ -144,6 +197,7 @@ const Seller = () => {
                             </div>
                         </div>
 
+                        {/* Color */}
                         <div className="mb-4">
                             <label className="block text-gray-700 font-medium mb-2">Color:</label>
                             <input
@@ -156,6 +210,7 @@ const Seller = () => {
                             />
                         </div>
 
+                        {/* Price */}
                         <div className="mb-4">
                             <label className="block text-gray-700 font-medium mb-2">Price ($):</label>
                             <input
@@ -168,6 +223,7 @@ const Seller = () => {
                             />
                         </div>
 
+                        {/* Description */}
                         <div className="mb-4">
                             <label className="block text-gray-700 font-medium mb-2">
                                 Description:
@@ -183,37 +239,21 @@ const Seller = () => {
                             ></textarea>
                         </div>
 
+                        {/* Submit Button */}
                         <button
                             type="submit"
-                            className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300"
+                            className="w-full p-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-300"
                         >
                             Add Car
                         </button>
                     </form>
-
-                    {message && (
-                        <p className="text-center text-red-500 font-medium mt-4">{message}</p>
-                    )}
                 </div>
             </>
         );
-    }else{
+    } else {
         return (
-            <div className="flex items-center justify-center h-screen bg-gray-100">
-                <div className="text-center">
-                    <h1 className="text-2xl font-bold text-gray-800">
-                        Unauthorized Access
-                    </h1>
-                    <p className="text-gray-600 mt-2">
-                        You must be logged in as an Seller to view this page.
-                    </p>
-                    <button
-                        onClick={() => navigate('/login')}
-                        className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                    >
-                        Go to Login
-                    </button>
-                </div>
+            <div>
+                <h1>You are not authorized to access this page.</h1>
             </div>
         );
     }
