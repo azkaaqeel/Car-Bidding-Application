@@ -35,7 +35,7 @@ const LoginPage = () => {
         } else if (userRole === "Buyer") {
           history("/Buyer");
         } else if (userRole === "Seller") {
-          history("/seller-dashboard");
+          history("/Seller");
         }
       } else {
         setError(response.data.message || "Invalid credentials or role");
