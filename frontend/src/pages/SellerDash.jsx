@@ -1,32 +1,50 @@
 import { Link } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { Navigate } from 'react-router-dom';
 
 const SellerDash = () => {
     const [cars, setCars] = useState([]);
-    const [sellerId, setSellerId] = useState(null); // Replace with actual sellerId retrieval logic
+    const [isSeller, setIsSeller] = useState(false);
+    const [SellerID, setSellerID] = useState(false);
+    // const navigate = useNavigate();
+
 
     useEffect(() => {
-        // Retrieve sellerId from cookies, local storage, or authentication
-        const storedSellerId = document.cookie
+        // Check if the user has the Buyer role
+        const storedUserRole = document.cookie
             .split('; ')
-            .find((row) => row.startsWith('sellerId='))
+            .find((row) => row.startsWith('userRole='))
             ?.split('=')[1];
-        setSellerId(storedSellerId);
 
-        if (storedSellerId) {
-            fetchCarsBySeller(storedSellerId);
+            const storeID=
+            document.cookie
+            .split('; ')
+            .find((row) => row.startsWith('userId='))
+            ?.split('=')[1];
+            
+
+        if (storedUserRole === 'Seller') {
+            setIsSeller(true);
+            setSellerID(storeID)
+            fetchCarsBySeller()
+
+            // fetchCars();
+        } else {
+            setIsSeller(false);
         }
     }, []);
 
-    const fetchCarsBySeller = (sellerId) => {
+    const fetchCarsBySeller = () => {
+        console.log(SellerID)
+
         axios
-            .get(`http://localhost:5000/api/cars/seller/${sellerId}`)
+            .get(`http://localhost:5000/api/cars/seller/${SellerID}`)
             .then((response) => setCars(response.data))
             .catch((error) => console.error('Error fetching seller cars:', error));
     };
 
-    if (!sellerId) {
+    if (!isSeller) {
         return (
             <div className="text-center mt-10">
                 <h2 className="text-2xl font-semibold text-gray-700">
