@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const Admin = () => {
     const [cars, setCars] = useState([]);
@@ -64,6 +65,10 @@ const Admin = () => {
 
     return (
         <div className="container mx-auto py-10">
+                <navbar><Link>View Sellers</Link></navbar>
+
+
+
             <h1 className="text-4xl font-bold text-center mb-8 text-gray-800">
                 Admin Dashboard
             </h1>
