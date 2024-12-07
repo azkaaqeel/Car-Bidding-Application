@@ -25,6 +25,10 @@ db.connect((err) => {
   console.log('Connected to MySQL database!');
 });
 
+app.get('/api/cars/make', (req, res) => {
+  
+})
+
 // Example API: Fetch Cars from DB
 app.get('/api/cars', (req, res) => {
   // SQL query to fetch all cars
@@ -37,6 +41,8 @@ app.get('/api/cars', (req, res) => {
     // console.log(results)  
   });
 });
+
+
 
 app.post('/api/cars', (req, res) => {
   const {
