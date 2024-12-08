@@ -7,18 +7,20 @@ import Buyer from './pages/Buyer';
 import Seller from './pages/Seller';
 import SellerDash from './pages/SellerDash';
 import Details from './pages/Details';
+<<<<<<< Updated upstream
 import Wishlist from './pages/Wishlist'; // Import the Wishlist component
 import About from './pages/About';
+=======
+import Wishlist from './pages/Wishlist';
+import Inbox from './pages/Inbox'; // Import the Inbox component
+>>>>>>> Stashed changes
 
 const App = () => {
     return (
         <Router>
             <Routes>
-                {/* Set the HomePage as the default route */}
                 <Route path="/" element={<HomePage />} />
                 <Route path="/Login" element={<LoginPage />} />
-                
-                {/* After login, this will show the Admin page */}
                 <Route path="/Admin" element={<Admin />} />
                 <Route path="/Buyer" element={<Buyer />} />
                 <Route path="/car/:car_id" element={<Details />} />
@@ -29,6 +31,8 @@ const App = () => {
 
                 {/* Add Wishlist route */}
                 <Route path="/wishlist" element={<Wishlist />} /> {/* New route for Wishlist */}
+                
+                <Route path="/inbox" element={<Inbox />} /> {/* Add the Inbox route */}
             </Routes>
         </Router>
     );

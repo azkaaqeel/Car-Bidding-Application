@@ -6,7 +6,8 @@ const Details = () => {
     const [userId, setUserId] = useState(null);
     const [userRole, setUserRole] = useState(null);
     const [car, setCar] = useState(null);
-    const [bids, setBids] = useState([]); // State to store bids
+    const [bids, setBids] = useState([]);
+    const [message, setMessage] = useState(""); 
     const [loading, setLoading] = useState(true);
 
     const { car_id } = useParams();
@@ -25,6 +26,9 @@ const Details = () => {
             setUserId(storedUserId);
             setUserRole(storedUserRole);
         }
+
+        console.log("User ID:", storedUserId);
+        console.log("User Role:", storedUserRole);
     }, []);
 
     const placeBid = async () => {
@@ -50,6 +54,26 @@ const Details = () => {
             setBids(response.data); // Update bids state
         } catch (error) {
             console.error("Error fetching bids:", error);
+        }
+    };
+
+    const sendMessage = async () => {
+        if (!message.trim()) {
+            alert("Please write a message before sending.");
+            return;
+        }
+
+        try {
+            await axios.post("http://localhost:5000/api/messages", {
+                user_id: userId,
+                seller_id: car.seller_id,
+                car_id,
+                message,
+            });
+            setMessage(""); // Clear the message input after sending
+            alert("Message sent to the seller.");
+        } catch (error) {
+            console.error("Error sending message:", error);
         }
     };
 
@@ -105,25 +129,51 @@ const Details = () => {
                         <strong>Seller ID:</strong> {car.seller_id}
                     </p>
                 </div>
+            </div>
 
-                {/* Place Bid */}
-                <div className="flex-1 bg-gray-50 rounded-lg p-6 lg:ml-4">
-                    <h2 className="text-xl font-semibold text-gray-800 mb-4">
-                        Place a Bid
-                    </h2>
-                    <input
-                        type="number"
-                        id="bid"
-                        placeholder="Enter your bid amount"
-                        className="w-full px-4 py-2 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                    />
-                    <button
-                        onClick={placeBid}
-                        className="w-full bg-yellow-500 text-white py-2 rounded-lg font-semibold hover:bg-yellow-600 transition"
-                    >
-                        Place Bid
-                    </button>
-                </div>
+            {/* Place Bid */}
+            <div className="mt-4 bg-white shadow-md rounded-lg p-6 w-full max-w-5xl">
+                <h2 className="text-xl font-semibold text-gray-800 mb-4">
+                    Place a Bid
+                </h2>
+                <input
+                    type="number"
+                    id="bid"
+                    placeholder="Enter your bid amount"
+                    className="w-full px-4 py-2 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                />
+                <button
+                    onClick={placeBid}
+                    className="w-full bg-yellow-500 text-white py-2 rounded-lg font-semibold hover:bg-yellow-600 transition"
+                >
+                    Place Bid
+                </button>
+            </div>
+
+            {/* Message Seller Section */}
+            <div>
+                {userRole === "Buyer" && userId ? (
+                    <div className="mt-8 bg-white shadow-md rounded-lg p-6 w-full max-w-5xl">
+                        <h2 className="text-xl font-semibold text-gray-800 mb-4">
+                            Message Seller
+                        </h2>
+                        <textarea
+                            value={message}
+                            onChange={(e) => setMessage(e.target.value)}
+                            rows="4"
+                            placeholder="Write your message to the seller..."
+                            className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                        />
+                        <button
+                            onClick={sendMessage}
+                            className="w-full bg-yellow-500 text-white py-2 rounded-lg font-semibold hover:bg-yellow-600 transition mt-4"
+                        >
+                            Send Message
+                        </button>
+                    </div>
+                ) : (
+                    <p className="mt-8 text-gray-500">You must be a buyer to send a message.</p>
+                )}
             </div>
 
             {/* Bid History Section */}
@@ -156,7 +206,6 @@ const Details = () => {
                     <p className="text-gray-500">No bids yet.</p>
                 )}
             </div>
-
         </div>
     );
 };

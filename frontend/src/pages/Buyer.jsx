@@ -82,14 +82,23 @@ const Buyer = () => {
         <div className="container mx-auto py-10">
             <div className="flex justify-between items-center mb-8">
                 <h1 className="text-4xl font-bold text-gray-800">Car Listings</h1>
-                {/* Wishlist Icon */}
-                <button
-                    onClick={() => navigate('/wishlist')}
-                    className="text-xl font-bold text-gray-800 flex items-center space-x-2"
-                >
-                    <i className="fas fa-cart-plus"></i>
-                    <span>({wishlist.length})</span>
-                </button>
+                {/* Wishlist and Inbox Buttons */}
+                <div className="space-x-4 flex">
+                    <button
+                        onClick={() => navigate('/wishlist')}
+                        className="text-xl font-bold text-gray-800 flex items-center space-x-2"
+                    >
+                        <i className="fas fa-heart"></i> {/* Heart icon for wishlist */}
+                        <span>Wishlist ({wishlist.length})</span>
+                    </button>
+                    <button
+                        onClick={() => navigate('/inbox')}
+                        className="text-xl font-bold text-gray-800 flex items-center space-x-2"
+                    >
+                        <i className="fas fa-envelope"></i> {/* Envelope icon for inbox */}
+                        <span>Inbox</span>
+                    </button>
+                </div>
             </div>
             {cars.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
