@@ -8,6 +8,7 @@ import Seller from './pages/Seller';
 import SellerDash from './pages/SellerDash';
 import Details from './pages/Details';
 import Wishlist from './pages/Wishlist'; // Import the Wishlist component
+import About from './pages/About';
 
 const App = () => {
     return (
@@ -23,6 +24,8 @@ const App = () => {
                 <Route path="/car/:car_id" element={<Details />} />
                 <Route path="/Seller" element={<Seller />} />
                 <Route path="/SellerDash" element={<SellerDash />} />
+                <Route path="/About" element={<About />} />
+
 
                 {/* Add Wishlist route */}
                 <Route path="/wishlist" element={<Wishlist />} /> {/* New route for Wishlist */}

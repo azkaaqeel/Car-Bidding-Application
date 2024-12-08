@@ -6,7 +6,7 @@ import { Navigate } from 'react-router-dom';
 const SellerDash = () => {
     const [cars, setCars] = useState([]);
     const [isSeller, setIsSeller] = useState(false);
-    const [SellerID, setSellerID] = useState(false);
+    const [SellerID, setSellerID] = useState();
     // const navigate = useNavigate();
 
 
@@ -17,17 +17,16 @@ const SellerDash = () => {
             .find((row) => row.startsWith('userRole='))
             ?.split('=')[1];
 
-            const storeID=
+        const storeID =
             document.cookie
-            .split('; ')
-            .find((row) => row.startsWith('userId='))
-            ?.split('=')[1];
-            
+                .split('; ')
+                .find((row) => row.startsWith('userId='))
+                ?.split('=')[1];
+
 
         if (storedUserRole === 'Seller') {
             setIsSeller(true);
             setSellerID(storeID)
-            fetchCarsBySeller()
 
             // fetchCars();
         } else {
@@ -35,8 +34,8 @@ const SellerDash = () => {
         }
     }, []);
 
+
     const fetchCarsBySeller = () => {
-        console.log(SellerID)
 
         axios
             .get(`http://localhost:5000/api/cars/seller/${SellerID}`)
@@ -53,6 +52,8 @@ const SellerDash = () => {
             </div>
         );
     }
+    fetchCarsBySeller()
+
 
     return (
         <div className="container mx-auto p-8">
@@ -64,7 +65,7 @@ const SellerDash = () => {
                 <p className="text-center text-gray-600 text-lg">
                     No cars listed yet.{" "}
                     <Link
-                        to="/add-car"
+                        to="/Seller"
                         className="text-blue-500 hover:underline font-medium"
                     >
                         Add a new car

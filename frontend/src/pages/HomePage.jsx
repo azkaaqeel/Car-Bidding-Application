@@ -1,30 +1,3 @@
-// import React, { useEffect, useState } from 'react';
-// import axios from 'axios';
-
-// const HomePage = () => {
-//     const [cars, setCars] = useState([]);
-
-//     useEffect(() => {
-//         axios.get('http://localhost:5000/api/cars')
-//             .then(response => setCars(response.data))
-//             .catch(error => console.error(error));
-//     }, []);
-
-//     return (
-//         <div>
-//             <h1>Available Cars</h1>
-//             <ul>
-//                 {cars.map(car => (
-//                     <li key={car.id}>{car.make} {car.model}</li>
-//                 ))}
-//             </ul>
-//         </div>
-//     );
-// };
-
-// export default HomePage;
-
-
 import React from "react";
 
 const HomePage = () => {
@@ -45,7 +18,7 @@ const HomePage = () => {
             Login
           </a>
           <a
-            href="/auctions"
+            href="/Buyer"
             className="text-sm md:text-base bg-yellow-500 text-gray-800 px-4 py-2 rounded hover:bg-yellow-600 transition"
           >
             View Auctions
@@ -65,13 +38,13 @@ const HomePage = () => {
         </p>
         <div className="mt-8 space-x-4">
           <a
-            href="/auctions"
+            href="/Buyer"
             className="bg-yellow-500 text-gray-800 px-6 py-3 text-lg rounded-lg hover:bg-yellow-600 transition"
           >
             Start Bidding
           </a>
           <a
-            href="#learn-more"
+            href="/About"x
             className="bg-gray-800 text-white px-6 py-3 text-lg rounded-lg hover:bg-gray-700 transition"
           >
             Learn More

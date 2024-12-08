@@ -14,8 +14,8 @@ app.use(express.json());
 // Database connection
 const db = mysql.createConnection({
   host: 'localhost',  // your database host
-  user: 'root',       // your database username
-  password: 'mahnoor1234',       // your database password
+  user: 'Project',       // your database username
+  password: 'Rakhidev11!!',       // your database password
   database: 'dbproject',  // your database name
 });
 
@@ -121,6 +121,43 @@ app.get('/api/categories', (req, res) => {
     res.json(results); // Send the categories as JSON
   });
 });
+
+
+  app.get('/api/users/sellers', (req, res) => {
+    // SQL query to fetch all categories
+    db.query('SELECT * FROM Users where role="Seller"', (err, results) => {
+      if (err) {
+        console.error('Error fetching seller:', err);
+        return res.status(500).json({ message: 'Error fetching seller' });
+      }
+      res.json(results); // Send the categories as JSON
+    });
+  });
+
+
+  app.get('/api/bids', (req, res) => {
+    // SQL query to fetch all categories
+    db.query('SELECT * FROM Bids ', (err, results) => {
+      if (err) {
+        console.error('Error fetching seller:', err);
+        return res.status(500).json({ message: 'Error fetching seller' });
+      }
+      res.json(results); // Send the categories as JSON
+    });
+  });
+
+
+
+  app.get('/api/users/buyer', (req, res) => {
+    // SQL query to fetch all categories
+    db.query('SELECT * FROM Users where role="Buyer"', (err, results) => {
+      if (err) {
+        console.error('Error fetching buyers:', err);
+        return res.status(500).json({ message: 'Error fetching buyers' });
+      }
+      res.json(results); // Send the categories as JSON
+    });
+  });
 
 app.get('/api/cars/:car_id/bids', (req, res) => {
   const car_id = req.params.car_id;

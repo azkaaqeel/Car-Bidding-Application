@@ -223,6 +223,33 @@ const Seller = () => {
                             />
                         </div>
 
+
+                        <div className="mb-4">
+                            <label className="block text-gray-700 font-medium mb-2">start date:</label>
+                            <input
+                                type="date"
+                                id="start"
+                                name="start"
+                                min="new date()"
+                                required
+                                className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                            />
+                        </div>
+
+                        <div className="mb-4">
+                            <label className="block text-gray-700 font-medium mb-2">End Date (in days):</label>
+                            <input
+                                type="date"
+                                id="end"
+                                name="end"
+                                min="0"
+                                required
+                                className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                            />
+                        </div>
+
+                        <input type="" />
+
                         {/* Description */}
                         <div className="mb-4">
                             <label className="block text-gray-700 font-medium mb-2">
