@@ -12,16 +12,16 @@ const HomePage = () => {
         </div>
         <div className="space-x-4">
           <a
+            href="/signup"
+            className="text-sm md:text-base hover:text-yellow-400 transition"
+          >
+            Create New Account
+          </a>
+          <a
             href="/login"
             className="text-sm md:text-base hover:text-yellow-400 transition"
           >
             Login
-          </a>
-          <a
-            href="/Buyer"
-            className="text-sm md:text-base bg-yellow-500 text-gray-800 px-4 py-2 rounded hover:bg-yellow-600 transition"
-          >
-            View Auctions
           </a>
         </div>
       </nav>
@@ -44,7 +44,7 @@ const HomePage = () => {
             Start Bidding
           </a>
           <a
-            href="/About"x
+            href="/About"
             className="bg-gray-800 text-white px-6 py-3 text-lg rounded-lg hover:bg-gray-700 transition"
           >
             Learn More

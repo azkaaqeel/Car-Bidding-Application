@@ -7,13 +7,11 @@ import Buyer from './pages/Buyer';
 import Seller from './pages/Seller';
 import SellerDash from './pages/SellerDash';
 import Details from './pages/Details';
-<<<<<<< Updated upstream
-import Wishlist from './pages/Wishlist'; // Import the Wishlist component
-import About from './pages/About';
-=======
 import Wishlist from './pages/Wishlist';
 import Inbox from './pages/Inbox'; // Import the Inbox component
->>>>>>> Stashed changes
+import Chat from './pages/Chat';  // Add this import for the Chat component
+import SignUp from './pages/signup'; // Import the SignUp component
+import CarDetails from './pages/CarDetails'; // Import the SignUp component
 
 const App = () => {
     return (
@@ -26,13 +24,21 @@ const App = () => {
                 <Route path="/car/:car_id" element={<Details />} />
                 <Route path="/Seller" element={<Seller />} />
                 <Route path="/SellerDash" element={<SellerDash />} />
-                <Route path="/About" element={<About />} />
-
-
-                {/* Add Wishlist route */}
-                <Route path="/wishlist" element={<Wishlist />} /> {/* New route for Wishlist */}
                 
-                <Route path="/inbox" element={<Inbox />} /> {/* Add the Inbox route */}
+                {/* Add Wishlist route */}
+                <Route path="/wishlist" element={<Wishlist />} />
+                
+                {/* Add Inbox route */}
+                <Route path="/inbox" element={<Inbox />} />
+                
+                {/* Add Chat route */}
+                <Route path="/chat/:seller_id/:car_id" element={<Chat />} />
+                  
+                {/* Add the route for the new CarDetails component */}
+                <Route path="/SellerDash/car/:car_id" element={<CarDetails />} />
+                
+                {/* Add Sign-Up route */}
+                <Route path="/signup" element={<SignUp />} /> {/* New route for Sign-Up */}
             </Routes>
         </Router>
     );
