@@ -8,79 +8,123 @@ const Seller = () => {
     const [categoryManual, setCategoryManual] = useState(false);
     const [makeManual, setMakeManual] = useState(false);
     const [inboxMessages, setInboxMessages] = useState([]); // State for inbox messages
-    const [isInboxOpen, setIsInboxOpen] = useState(false); // To control inbox dropdown visibility
+    const [notifications, setNotifications] = useState([]); // State for notifications
+    const [showNotifications, setShowNotifications] = useState(false); // Toggle notifications
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Check if the user has the Seller role
-        const storedUserRole = document.cookie
+        const userRole = document.cookie
             .split('; ')
             .find((row) => row.startsWith('userRole='))?.split('=')[1];
 
-        if (storedUserRole === 'Seller') {
+        if (userRole === 'Seller') {
             setIsSeller(true);
+            fetchNotifications();
         } else {
             setIsSeller(false);
         }
+    }, []);
 
-        // Fetch seller's inbox messages
-        if (isSeller) {
-            fetchInboxMessages();
+    // Fetch Notifications
+    const fetchNotifications = async () => {
+        const userId = document.cookie
+            .split('; ')
+            .find((row) => row.startsWith('userId='))?.split('=')[1];
+
+        if (!userId) {
+            console.error('User ID not found. Unable to fetch notifications.');
+            return;
         }
-    }, [isSeller]);
 
-    // Function to fetch inbox messages
-    const fetchInboxMessages = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/messages'); // Adjust the URL for your actual API
+            const response = await fetch(`http://localhost:5000/api/notifications/${userId}`);
             const data = await response.json();
-            setInboxMessages(data); // Assuming the response is an array of messages
+            setNotifications(data);
+        } catch (err) {
+            console.error('Error fetching notifications:', err);
+        }
+    };
+
+    // Mark Notification as Read
+    const markNotificationAsRead = async (notificationId) => {
+        try {
+            await fetch(`http://localhost:5000/api/notifications/${notificationId}/read`, {
+                method: 'PUT',
+            });
+            setNotifications((prev) =>
+                prev.map((notif) =>
+                    notif.notification_id === notificationId
+                        ? { ...notif, status: 'read' }
+                        : notif
+                )
+            );
+        } catch (err) {
+            console.error('Error marking notification as read:', err);
+        }
+    };
+
+    const addCar = async (e) => {
+        e.preventDefault();
+
+        const sellerId = document.cookie
+            .split('; ')
+            .find((row) => row.startsWith('userId='))?.split('=')[1];
+
+        if (!sellerId) {
+            alert('Error: Seller ID not found. Please log in again.');
+            navigate('/login');
+            return;
+        }
+
+        const startDateTime = new Date(document.getElementById('start').value)
+            .toISOString()
+            .slice(0, 19)
+            .replace('T', ' ');
+        const endDateTime = new Date(document.getElementById('end').value)
+            .toISOString()
+            .slice(0, 19)
+            .replace('T', ' ');
+
+        const carData = {
+            make: makeManual
+                ? document.getElementById('make').value
+                : document.getElementById('makeSelect').value,
+            category_name: categoryManual
+                ? document.getElementById('category').value
+                : document.getElementById('categorySelect').value,
+            model: document.getElementById('model').value,
+            year: parseInt(document.getElementById('year').value),
+            mileage: parseInt(document.getElementById('mileage').value),
+            color: document.getElementById('color').value,
+            price: parseInt(document.getElementById('price').value),
+            description: document.getElementById('description').value,
+            seller_id: parseInt(sellerId),
+            start_time: startDateTime,
+            end_time: endDateTime,
+            image_path: document.getElementById('image_path').value,
+        };
+
+        try {
+            const response = await fetch('http://localhost:5000/api/cars', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(carData),
+            });
+
+            if (response.ok) {
+                alert('Car added successfully!');
+            } else {
+                const error = await response.json();
+                alert(`Error: ${error.message}`);
+            }
         } catch (err) {
             setMessage(`Error: ${err.message}`);
         }
     };
 
-    const toggleInbox = () => {
-        setIsInboxOpen(!isInboxOpen); // Toggle inbox dropdown visibility
-    };
-
     if (isSeller) {
-        const addCar = async (e) => {
-            e.preventDefault();
-
-            const carData = {
-                make: makeManual ? document.getElementById('make').value : document.getElementById('makeSelect').value,
-                category_name: categoryManual ? document.getElementById('category').value : document.getElementById('categorySelect').value,
-                model: document.getElementById('model').value,
-                year: parseInt(document.getElementById('year').value),
-                mileage: parseInt(document.getElementById('mileage').value),
-                color: document.getElementById('color').value,
-                price: parseInt(document.getElementById('price').value),
-                description: document.getElementById('description').value,
-                seller_id: 1, // Replace with actual seller_id if available
-                image_path: document.getElementById('image_path').value,
-            };
-
-            try {
-                const response = await fetch('http://localhost:5000/api/cars', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(carData),
-                });
-
-                if (response.ok) {
-                    alert('Car added successfully!');
-                } else {
-                    const error = await response.json();
-                    alert(`Error: ${error.message}`);
-                }
-            } catch (err) {
-                setMessage(`Error: ${err.message}`);
-            }
-        };
-
         return (
             <>
                 <nav className="bg-gray-800 p-4">
@@ -89,50 +133,69 @@ const Seller = () => {
                             to="/SellerDash"
                             className="text-white text-lg font-semibold hover:underline"
                         >
-                            View All Listings
+                            View My Listings
                         </Link>
 
-                        {/* Inbox Icon */}
+                        {/* Notifications Button */}
                         <div className="relative">
                             <button
-                                onClick={toggleInbox}
-                                className="text-white p-2 rounded-full hover:bg-gray-700"
-                                aria-label="Inbox"
+                                onClick={() => setShowNotifications(!showNotifications)}
+                                className="text-white p-2 rounded-full hover:bg-gray-700 relative"
+                                aria-label="Notifications"
                             >
-                                📨
+                                🔔 Notifications
+                                {notifications.some((notif) => notif.status === 'unread') && (
+                                    <span className="absolute top-0 right-0 bg-red-600 text-white text-xs px-1 rounded-full">
+                                        {notifications.filter((notif) => notif.status === 'unread').length}
+                                    </span>
+                                )}
                             </button>
 
-                            {/* Inbox Dropdown */}
-                            {isInboxOpen && (
+                            {/* Notifications Dropdown */}
+                            {showNotifications && (
                                 <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-300 shadow-lg rounded-lg p-4 z-10">
-                                    <h3 className="font-semibold text-lg">Inbox</h3>
-                                    <div className="space-y-2">
-                                        {inboxMessages.length > 0 ? (
-                                            inboxMessages.map((message, index) => (
-                                                <div
-                                                    key={index}
-                                                    className="p-2 border-b border-gray-300 last:border-none"
+                                    <h3 className="font-semibold text-lg mb-2">Notifications</h3>
+                                    <ul>
+                                        {notifications.length > 0 ? (
+                                            notifications.map((notif) => (
+                                                <li
+                                                    key={notif.notification_id}
+                                                    className={`p-2 mb-2 rounded-lg ${
+                                                        notif.status === 'unread' ? 'bg-gray-200' : 'bg-gray-100'
+                                                    }`}
                                                 >
-                                                    <p>
-                                                        <strong>From: </strong>
-                                                        {message.sender}
+                                                    <p>{notif.message}</p>
+                                                    <p className="text-xs text-gray-500">
+                                                        {new Date(notif.created_at).toLocaleString()}
                                                     </p>
-                                                    <p>
-                                                        <strong>Message: </strong>
-                                                        {message.content}
-                                                    </p>
-                                                    <button className="text-blue-600">
-                                                        View Details
-                                                    </button>
-                                                </div>
+                                                    {notif.status === 'unread' && (
+                                                        <button
+                                                            onClick={() =>
+                                                                markNotificationAsRead(notif.notification_id)
+                                                            }
+                                                            className="text-blue-600 text-sm mt-1"
+                                                        >
+                                                            Mark as Read
+                                                        </button>
+                                                    )}
+                                                </li>
                                             ))
                                         ) : (
-                                            <p>No new messages.</p>
+                                            <p className="text-gray-600">No notifications available.</p>
                                         )}
-                                    </div>
+                                    </ul>
                                 </div>
                             )}
                         </div>
+
+                        {/* Inbox Navigation Button */}
+                        <button
+                            onClick={() => navigate('/inbox')}
+                            className="text-white p-2 rounded-full hover:bg-gray-700"
+                            aria-label="Inbox"
+                        >
+                            📨 Inbox
+                        </button>
                     </div>
                 </nav>
 
@@ -140,7 +203,6 @@ const Seller = () => {
                     <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">
                         Add a New Car
                     </h1>
-
                     {/* Add Car Form */}
                     <form
                         onSubmit={addCar}
@@ -219,7 +281,7 @@ const Seller = () => {
                             </div>
                         </div>
 
-                        {/* Model */}
+                        {/* Other Fields */}
                         <div className="mb-4">
                             <label className="block text-gray-700 font-medium mb-2">Model:</label>
                             <input
@@ -232,7 +294,6 @@ const Seller = () => {
                             />
                         </div>
 
-                        {/* Year and Mileage */}
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-gray-700 font-medium mb-2">Year:</label>
@@ -259,7 +320,6 @@ const Seller = () => {
                             </div>
                         </div>
 
-                        {/* Color and Price */}
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-gray-700 font-medium mb-2">Color:</label>
@@ -284,34 +344,29 @@ const Seller = () => {
                             </div>
                         </div>
 
-
+                        {/* Start Date and Time */}
                         <div className="mb-4">
-                            <label className="block text-gray-700 font-medium mb-2">start date:</label>
+                            <label className="block text-gray-700 font-medium mb-2">Start Date and Time:</label>
                             <input
-                                type="date"
+                                type="datetime-local"
                                 id="start"
                                 name="start"
-                                min="new date()"
                                 required
                                 className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
                             />
                         </div>
 
+                        {/* End Date and Time */}
                         <div className="mb-4">
-                            <label className="block text-gray-700 font-medium mb-2">End Date (in days):</label>
+                            <label className="block text-gray-700 font-medium mb-2">End Date and Time:</label>
                             <input
-                                type="date"
+                                type="datetime-local"
                                 id="end"
                                 name="end"
-                                min="0"
                                 required
                                 className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
                             />
                         </div>
-
-                        <input type="" />
-
-                        {/* Description */}
                         <div className="mb-4">
                             <label className="block text-gray-700 font-medium mb-2">Description:</label>
                             <textarea

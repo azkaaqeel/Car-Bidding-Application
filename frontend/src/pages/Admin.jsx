@@ -7,13 +7,13 @@ const AdminDashboard = () => {
   const [sellers, setSellers] = useState([]);
   const [buyers, setBuyers] = useState([]);
   const [bids, setBids] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [selectedSeller, setSelectedSeller] = useState(null);
   const [selectedBuyer, setSelectedBuyer] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if user is logged in as admin
     const storedUserRole = document.cookie
       .split('; ')
       .find((row) => row.startsWith('userRole='))
@@ -21,12 +21,17 @@ const AdminDashboard = () => {
 
     if (storedUserRole === 'Admin') {
       setIsAdmin(true);
-      fetchCars();
-      fetchUsers();
+      fetchData();
     } else {
       setIsAdmin(false);
     }
   }, []);
+
+  const fetchData = () => {
+    fetchCars();
+    fetchUsers();
+    fetchCategories();
+  };
 
   const fetchCars = () => {
     axios
@@ -41,24 +46,52 @@ const AdminDashboard = () => {
     axios.get('http://localhost:5000/api/bids').then((response) => setBids(response.data));
   };
 
-  const handleDelete = (carId) => {
+  const fetchCategories = () => {
+    axios
+      .get('http://localhost:5000/api/categories')
+      .then((response) => setCategories(response.data))
+      .catch((error) => console.error('Error fetching categories:', error));
+  };
+
+  const deleteCar = (carId) => {
     axios
       .delete(`http://localhost:5000/api/cars/${carId}`)
-      .then((response) => {
-        console.log('Car deleted:', response.data);
-        fetchCars(); // Refresh the car list after deletion
+      .then(() => {
+        alert('Car deleted successfully!');
+        fetchCars();
       })
-      .catch((error) => {
-        console.error('Error deleting car:', error);
-      });
+      .catch((error) => console.error('Error deleting car:', error));
   };
 
-  const handleSellerSelection = (sellerId) => {
-    setSelectedSeller(sellerId);
+  const deleteUser = (userId, role) => {
+    const endpoint = role === 'Seller' ? '/api/users/sellers' : '/api/users/buyer';
+    axios
+      .delete(`http://localhost:5000${endpoint}/${userId}`)
+      .then(() => {
+        alert(`${role} deleted successfully!`);
+        fetchUsers();
+      })
+      .catch((error) => console.error('Error deleting user:', error));
   };
 
-  const handleBuyerSelection = (buyerId) => {
-    setSelectedBuyer(buyerId);
+  const deleteBid = (bidId) => {
+    axios
+      .delete(`http://localhost:5000/api/bids/${bidId}`)
+      .then(() => {
+        alert('Bid deleted successfully!');
+        fetchUsers();
+      })
+      .catch((error) => console.error('Error deleting bid:', error));
+  };
+
+  const deleteCategory = (categoryId) => {
+    axios
+      .delete(`http://localhost:5000/api/categories/${categoryId}`)
+      .then(() => {
+        alert('Category deleted successfully!');
+        fetchCategories();
+      })
+      .catch((error) => console.error('Error deleting category:', error));
   };
 
   const filteredCars = selectedSeller
@@ -88,7 +121,6 @@ const AdminDashboard = () => {
 
   return (
     <div className="flex h-auto bg-gray-100">
-      {/* Sidebar */}
       <div className="w-64 bg-gray-800 text-yellow-300 p-6 space-y-8 h-auto">
         <h2 className="text-2xl font-semibold">Admin Panel</h2>
         <ul className="space-y-6 text-lg">
@@ -96,144 +128,71 @@ const AdminDashboard = () => {
           <li><a href="#cars" className="block py-2 hover:bg-blue-600 rounded">Cars</a></li>
           <li><a href="#users" className="block py-2 hover:bg-blue-600 rounded">Users</a></li>
           <li><a href="#bids" className="block py-2 hover:bg-blue-600 rounded">Bids</a></li>
+          <li><a href="#categories" className="block py-2 hover:bg-blue-600 rounded">Categories</a></li>
         </ul>
       </div>
 
-      {/* Main Content */}
       <div className="flex-1 p-6 space-y-6">
-        {/* Header */}
-        <div className="flex justify-between items-center bg-white p-4 shadow-md rounded-lg">
-          <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-          <div className="flex items-center space-x-4">
-            <img src="/profile.jpg" alt="Profile" className="w-10 h-10 rounded-full" />
-            <span className="text-lg font-semibold">Admin</span>
-          </div>
-        </div>
-
-        {/* View All Listings */}
         <div id="cars" className="bg-white p-6 rounded-lg shadow-md">
           <h3 className="text-2xl font-semibold mb-4">All Car Listings</h3>
-
-          {cars.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {cars.map((car) => (
-                <div
-                  key={car.car_id}
-                  className="relative bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200 hover:shadow-xl transition"
-                >
-                  <img
-                    src={car.image_path || 'default-car-image.jpg'}
-                    alt={car.make}
-                    className="w-full h-40 object-cover"
-                  />
-                  <div className="p-4">
-                    <h2 className="text-lg font-semibold text-gray-800">{car.make} {car.model}</h2>
-                    <p className="text-gray-600 mt-1">Year: {car.year}</p>
-                    <p className="text-gray-600 mt-1">Mileage: {car.mileage.toLocaleString()} miles</p>
-                    <p className="text-gray-800 font-bold mt-2">${car.price.toLocaleString()}</p>
-                    <button
-                      onClick={() => handleDelete(car.car_id)}
-                      className="absolute top-3 right-3 text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded-full text-sm font-medium transition"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              ))}
+          {cars.map((car) => (
+            <div key={car.car_id} className="flex justify-between items-center p-4 border-b">
+              <div>
+                <p>{car.make} {car.model}</p>
+                <p>Price: ${car.price}</p>
+              </div>
+              <button onClick={() => deleteCar(car.car_id)} className="text-red-600">Delete</button>
             </div>
-          ) : (
-            <div className="text-center">
-              <p className="text-gray-600 text-lg">No cars available.</p>
-            </div>
-          )}
+          ))}
         </div>
 
-        {/* Select Seller to View Listings */}
         <div id="users" className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-2xl font-semibold mb-4">Select Seller</h3>
-          <select
-            className="w-full p-3 rounded-md border"
-            onChange={(e) => handleSellerSelection(parseInt(e.target.value))}
-            value={selectedSeller || ''}
-          >
-            <option value="">-- Select Seller --</option>
-            {sellers.map((seller) => (
-              <option key={seller.user_id} value={seller.user_id}>
-                {seller.first_name} {seller.last_name}
-              </option>
-            ))}
-          </select>
-
-          {/* Seller Listings */}
-          {selectedSeller && (
-            <div className="mt-6">
-              <h4 className="text-xl font-semibold">Listings by {sellers.find(seller => seller.user_id === selectedSeller)?.first_name}</h4>
-              <table className="w-full table-auto mt-4">
-                <thead className="bg-gray-200">
-                  <tr>
-                    <th className="p-3">Make</th>
-                    <th className="p-3">Model</th>
-                    <th className="p-3">Year</th>
-                    <th className="p-3">Price</th>
-                    <th className="p-3">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredCars.map((car) => (
-                    <tr key={car.car_id} className="hover:bg-gray-100">
-                      <td className="p-3">{car.make}</td>
-                      <td className="p-3">{car.model}</td>
-                      <td className="p-3">{car.year}</td>
-                      <td className="p-3">${car.price}</td>
-                      <td className="p-3">{car.status}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          <h3 className="text-2xl font-semibold mb-4">All Sellers</h3>
+          {sellers.map((seller) => (
+            <div key={seller.user_id} className="flex justify-between items-center p-4 border-b">
+              <div>
+                <p>{seller.first_name} {seller.last_name}</p>
+                <p>Email: {seller.email}</p>
+              </div>
+              <button onClick={() => deleteUser(seller.user_id, 'Seller')} className="text-red-600">Delete</button>
             </div>
-          )}
+          ))}
+
+          <h3 className="text-2xl font-semibold mt-6 mb-4">All Buyers</h3>
+          {buyers.map((buyer) => (
+            <div key={buyer.user_id} className="flex justify-between items-center p-4 border-b">
+              <div>
+                <p>{buyer.first_name} {buyer.last_name}</p>
+                <p>Email: {buyer.email}</p>
+              </div>
+              <button onClick={() => deleteUser(buyer.user_id, 'Buyer')} className="text-red-600">Delete</button>
+            </div>
+          ))}
         </div>
 
-        {/* Select Buyer to View Bids */}
-        <div id="buyers" className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-2xl font-semibold mb-4">Select Buyer</h3>
-          <select
-            className="w-full p-3 rounded-md border"
-            onChange={(e) => handleBuyerSelection(parseInt(e.target.value))}
-            value={selectedBuyer || ''}
-          >
-            <option value="">-- Select Buyer --</option>
-            {buyers.map((buyer) => (
-              <option key={buyer.user_id} value={buyer.user_id}>
-                {buyer.first_name} {buyer.last_name}
-              </option>
-            ))}
-          </select>
-
-          {/* Buyer Bids */}
-          {selectedBuyer && (
-            <div className="mt-6" id="bids" >
-              <h4 className="text-xl font-semibold">Bids by {buyers.find(buyer => buyer.user_id === selectedBuyer)?.first_name}</h4>
-              <table className="w-full table-auto mt-4">
-                <thead className="bg-gray-200">
-                  <tr>
-                    <th className="p-3">Car</th>
-                    <th className="p-3">Bid Amount</th>
-                    <th className="p-3">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredBids.map((bid) => (
-                    <tr key={bid.bid_id} className="hover:bg-gray-100">
-                      <td className="p-3">{cars.find(car => car.car_id === bid.car_id)?.make} {cars.find(car => car.car_id === bid.car_id)?.model}</td>
-                      <td className="p-3">${bid.bid_amount}</td>
-                      <td className="p-3">{bid.status}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+        <div id="bids" className="bg-white p-6 rounded-lg shadow-md">
+          <h3 className="text-2xl font-semibold mb-4">All Bids</h3>
+          {bids.map((bid) => (
+            <div key={bid.bid_id} className="flex justify-between items-center p-4 border-b">
+              <div>
+                <p>Bid Amount: ${bid.bid_amount}</p>
+                <p>Status: {bid.status}</p>
+              </div>
+              <button onClick={() => deleteBid(bid.bid_id)} className="text-red-600">Delete</button>
             </div>
-          )}
+          ))}
+        </div>
+
+        <div id="categories" className="bg-white p-6 rounded-lg shadow-md">
+          <h3 className="text-2xl font-semibold mb-4">All Categories</h3>
+          {categories.map((category) => (
+            <div key={category.category_id} className="flex justify-between items-center p-4 border-b">
+              <div>
+                <p>{category.category_name}</p>
+              </div>
+              <button onClick={() => deleteCategory(category.category_id)} className="text-red-600">Delete</button>
+            </div>
+          ))}
         </div>
       </div>
     </div>
