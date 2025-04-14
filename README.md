@@ -11,5 +11,4 @@ Tech Stack
 Frontend: React.js
 Backend: Node.js
 Database: MySQL
-ORM: Sequelize
 Real time updates using SQL events
